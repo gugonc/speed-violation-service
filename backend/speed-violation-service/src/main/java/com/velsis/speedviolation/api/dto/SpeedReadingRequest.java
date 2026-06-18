@@ -2,8 +2,8 @@ package com.velsis.speedviolation.api.dto;
 
 public record SpeedReadingRequest(
         String licensePlate,
-        Integer measuredSpeed,
-        Integer speedLimit,
+        Double measuredSpeed,
+        Double speedLimit,
         String equipmentId,
         String captureTimestamp
 ) {

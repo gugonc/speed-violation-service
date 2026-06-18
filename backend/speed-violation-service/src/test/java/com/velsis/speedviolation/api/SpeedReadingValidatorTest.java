@@ -26,13 +26,13 @@ class SpeedReadingValidatorTest {
     private final Clock clock = Clock.fixed(FIXED_NOW, ZoneOffset.UTC);
     private final SpeedReadingValidator validator = new SpeedReadingValidator(clock);
 
-    private SpeedReadingRequest request(String plate, Integer measured, Integer limit,
+    private SpeedReadingRequest request(String plate, Double measured, Double limit,
                                         String equipmentId, String timestamp) {
         return new SpeedReadingRequest(plate, measured, limit, equipmentId, timestamp);
     }
 
     private SpeedReadingRequest validRequest() {
-        return request("ABC1D23", 92, 60, "RAD-CWB-001", "2026-06-08T14:30:00Z");
+        return request("ABC1D23", 92.0, 60.0, "RAD-CWB-001", "2026-06-08T14:30:00Z");
     }
 
     private void assertError(SpeedReadingRequest req, String origin, ApiError expected) {
@@ -78,7 +78,7 @@ class SpeedReadingValidatorTest {
         @NullAndEmptySource
         @DisplayName("Placa ausente ou vazia -> INVALID_LICENSE_PLATE")
         void missingPlate(String plate) {
-            assertError(request(plate, 92, 60, "RAD-1", "2026-06-08T14:30:00Z"),
+            assertError(request(plate, 92.0, 60.0, "RAD-1", "2026-06-08T14:30:00Z"),
                     "FIXED", ApiError.INVALID_LICENSE_PLATE);
         }
     }
@@ -88,25 +88,33 @@ class SpeedReadingValidatorTest {
     class Speeds {
 
         @ParameterizedTest
-        @ValueSource(ints = {0, -1, -50})
+        @ValueSource(doubles = {0, -1, -50})
         @DisplayName("measuredSpeed <= 0 -> INVALID_MEASURED_SPEED")
-        void invalidMeasuredSpeed(int measured) {
-            assertError(request("ABC1234", measured, 60, "RAD-1", "2026-06-08T14:30:00Z"),
+        void invalidMeasuredSpeed(double measured) {
+            assertError(request("ABC1234", measured, 60.0, "RAD-1", "2026-06-08T14:30:00Z"),
                     "FIXED", ApiError.INVALID_MEASURED_SPEED);
+        }
+
+        @Test
+        @DisplayName("measuredSpeed decimal positivo e aceito e arredondado")
+        void acceptsDecimalMeasuredSpeed() {
+            SpeedReadingCommand cmd = validator.validateAndBuild(
+                    request("ABC1234", 85.5, 60.0, "RAD-1", "2026-06-08T14:30:00Z"), "FIXED");
+            assertThat(cmd.measuredSpeed()).isEqualTo(86);
         }
 
         @Test
         @DisplayName("measuredSpeed ausente -> INVALID_MEASURED_SPEED")
         void missingMeasuredSpeed() {
-            assertError(request("ABC1234", null, 60, "RAD-1", "2026-06-08T14:30:00Z"),
+            assertError(request("ABC1234", null, 60.0, "RAD-1", "2026-06-08T14:30:00Z"),
                     "FIXED", ApiError.INVALID_MEASURED_SPEED);
         }
 
         @ParameterizedTest
-        @ValueSource(ints = {0, -10})
+        @ValueSource(doubles = {0, -10})
         @DisplayName("speedLimit <= 0 -> INVALID_SPEED_LIMIT")
-        void invalidSpeedLimit(int limit) {
-            assertError(request("ABC1234", 92, limit, "RAD-1", "2026-06-08T14:30:00Z"),
+        void invalidSpeedLimit(double limit) {
+            assertError(request("ABC1234", 92.0, limit, "RAD-1", "2026-06-08T14:30:00Z"),
                     "FIXED", ApiError.INVALID_SPEED_LIMIT);
         }
     }
@@ -120,7 +128,7 @@ class SpeedReadingValidatorTest {
         @ValueSource(strings = {"   "})
         @DisplayName("equipmentId ausente/em branco -> INVALID_EQUIPMENT_ID")
         void blankEquipmentId(String equipmentId) {
-            assertError(request("ABC1234", 92, 60, equipmentId, "2026-06-08T14:30:00Z"),
+            assertError(request("ABC1234", 92.0, 60.0, equipmentId, "2026-06-08T14:30:00Z"),
                     "FIXED", ApiError.INVALID_EQUIPMENT_ID);
         }
     }
@@ -134,14 +142,14 @@ class SpeedReadingValidatorTest {
         @ValueSource(strings = {"08/06/2026", "2026-06-08", "not-a-date", "2026-13-08T14:30:00Z"})
         @DisplayName("Ausente ou fora do ISO-8601 -> INVALID_CAPTURE_TIMESTAMP")
         void invalidTimestamp(String timestamp) {
-            assertError(request("ABC1234", 92, 60, "RAD-1", timestamp),
+            assertError(request("ABC1234", 92.0, 60.0, "RAD-1", timestamp),
                     "FIXED", ApiError.INVALID_CAPTURE_TIMESTAMP);
         }
 
         @Test
         @DisplayName("Timestamp no futuro -> INVALID_CAPTURE_TIMESTAMP")
         void futureTimestamp() {
-            assertError(request("ABC1234", 92, 60, "RAD-1", "2099-01-01T00:00:00Z"),
+            assertError(request("ABC1234", 92.0, 60.0, "RAD-1", "2099-01-01T00:00:00Z"),
                     "FIXED", ApiError.INVALID_CAPTURE_TIMESTAMP);
         }
 
@@ -149,7 +157,7 @@ class SpeedReadingValidatorTest {
         @DisplayName("Aceita offset diferente de Z")
         void acceptsNonZuluOffset() {
             SpeedReadingCommand command = validator.validateAndBuild(
-                    request("ABC1234", 92, 60, "RAD-1", "2026-06-08T11:30:00-03:00"), "FIXED");
+                    request("ABC1234", 92.0, 60.0, "RAD-1", "2026-06-08T11:30:00-03:00"), "FIXED");
             assertThat(command.captureTimestamp()).isEqualTo(Instant.parse("2026-06-08T14:30:00Z"));
         }
     }

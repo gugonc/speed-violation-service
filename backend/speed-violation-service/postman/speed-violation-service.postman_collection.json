@@ -1,0 +1,85 @@
+{
+  "info": {
+    "name": "Speed Violation Service",
+    "description": "Exemplos de leituras para o microsservico de apuracao de infracoes.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:8080" }
+  ],
+  "item": [
+    {
+      "name": "Evaluate - com infracao (SERIOUS)",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "x-origin", "value": "FIXED" },
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"licensePlate\": \"ABC1D23\",\n  \"measuredSpeed\": 92,\n  \"speedLimit\": 60,\n  \"equipmentId\": \"RAD-CWB-001\",\n  \"captureTimestamp\": \"2026-06-08T14:30:00Z\"\n}"
+        },
+        "url": { "raw": "{{baseUrl}}/api/v1/violations/evaluate", "host": ["{{baseUrl}}"], "path": ["api", "v1", "violations", "evaluate"] }
+      }
+    },
+    {
+      "name": "Evaluate - sem infracao",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "x-origin", "value": "MOBILE" },
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"licensePlate\": \"ABC1D23\",\n  \"measuredSpeed\": 64,\n  \"speedLimit\": 60,\n  \"equipmentId\": \"RAD-CWB-001\",\n  \"captureTimestamp\": \"2026-06-08T14:30:00Z\"\n}"
+        },
+        "url": { "raw": "{{baseUrl}}/api/v1/violations/evaluate", "host": ["{{baseUrl}}"], "path": ["api", "v1", "violations", "evaluate"] }
+      }
+    },
+    {
+      "name": "Evaluate - via acima de 100 km/h (VERY_SERIOUS)",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "x-origin", "value": "HANDHELD" },
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"licensePlate\": \"BRA2E19\",\n  \"measuredSpeed\": 200,\n  \"speedLimit\": 110,\n  \"equipmentId\": \"RAD-BR277-014\",\n  \"captureTimestamp\": \"2026-06-08T14:30:00Z\"\n}"
+        },
+        "url": { "raw": "{{baseUrl}}/api/v1/violations/evaluate", "host": ["{{baseUrl}}"], "path": ["api", "v1", "violations", "evaluate"] }
+      }
+    },
+    {
+      "name": "Evaluate - placa invalida (erro 400)",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "x-origin", "value": "FIXED" },
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"licensePlate\": \"INVALID\",\n  \"measuredSpeed\": 92,\n  \"speedLimit\": 60,\n  \"equipmentId\": \"RAD-CWB-001\",\n  \"captureTimestamp\": \"2026-06-08T14:30:00Z\"\n}"
+        },
+        "url": { "raw": "{{baseUrl}}/api/v1/violations/evaluate", "host": ["{{baseUrl}}"], "path": ["api", "v1", "violations", "evaluate"] }
+      }
+    },
+    {
+      "name": "Consultar infracoes por placa",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/v1/violations?licensePlate=ABC1D23",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "v1", "violations"],
+          "query": [{ "key": "licensePlate", "value": "ABC1D23" }]
+        }
+      }
+    }
+  ]
+}

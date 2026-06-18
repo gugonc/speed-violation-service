@@ -1,0 +1,30 @@
+# Maven
+target/
+!**/maven-wrapper.jar
+
+# IDEs
+.idea/
+*.iml
+*.ipr
+*.iws
+.vscode/
+.settings/
+.project
+.classpath
+nbproject/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# Build output
+build/
+out/
+
+# Frontend
+frontend/speed-violation-console/.env
+frontend/speed-violation-console/config.js
+frontend/speed-violation-console/.vercel

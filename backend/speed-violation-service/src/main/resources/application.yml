@@ -1,0 +1,23 @@
+server:
+  port: ${PORT:${SERVER_PORT:8080}}
+
+spring:
+  application:
+    name: speed-violation-service
+  jackson:
+    serialization:
+      write-dates-as-timestamps: false
+
+violation:
+  tolerance:
+    kmh: 7
+    percent: 7
+    threshold-speed: 100
+
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+
+logging:
+  level:
+    com.velsis.speedviolation: INFO

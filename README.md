@@ -12,7 +12,7 @@ Desenvolvido como prova prática para a vaga de **Desenvolvedor FullStack Java**
 |---|---|
 | API (Railway) | `https://speed-violation-service-production.up.railway.app` |
 | Swagger UI | `https://speed-violation-service-production.up.railway.app/swagger-ui.html` |
-| Console visual (Vercel) | `https://speed-violation-console.vercel.app` |
+| Console visual (Vercel) | `https://speed-violation-service.vercel.app` |
 
 ### Testando a aplicação hospedada
 

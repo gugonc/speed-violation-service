@@ -7,6 +7,7 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
+import java.sql.Timestamp;
 import java.util.List;
 
 @Repository
@@ -29,7 +30,7 @@ public class JdbcViolationRepository implements ViolationRepository {
                 """,
                 v.licensePlate(), v.equipmentId(), v.measuredSpeed(), v.consideredSpeed(),
                 v.speedLimit(), v.excessPercentage(), v.severity().name(),
-                v.captureTimestamp(), v.processedAt()
+                Timestamp.from(v.captureTimestamp()), Timestamp.from(v.processedAt())
         );
     }
 

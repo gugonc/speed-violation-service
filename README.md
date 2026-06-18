@@ -12,7 +12,7 @@ Desenvolvido como prova prática para a vaga de **Desenvolvedor FullStack Java**
 |---|---|
 | API (Railway) | `https://speed-violation-service-production.up.railway.app` |
 | Swagger UI | `https://speed-violation-service-production.up.railway.app/swagger-ui.html` |
-| Console visual (Vercel) | `https://speed-violation-service.vercel.app` |
+| Console visual (Vercel) | `https://speed-violation-console.vercel.app` |
 
 ### Testando a aplicação hospedada
 
@@ -40,6 +40,14 @@ curl -s -X POST https://speed-violation-service-production.up.railway.app/api/v1
   -d '{"licensePlate":"ABC1D23","measuredSpeed":130,"speedLimit":60,"equipmentId":"RAD-CWB-001","captureTimestamp":"2026-06-17T14:30:00Z"}'
 ```
 
+**Velocidade decimal (aceita e arredondada)**:
+```bash
+curl -s -X POST https://speed-violation-service-production.up.railway.app/api/v1/violations/evaluate \
+  -H "Content-Type: application/json" \
+  -H "x-origin: FIXED" \
+  -d '{"licensePlate":"ABC1D23","measuredSpeed":85.5,"speedLimit":60,"equipmentId":"RAD-CWB-001","captureTimestamp":"2026-06-17T14:30:00Z"}'
+```
+
 **Sem infração**:
 ```bash
 curl -s -X POST https://speed-violation-service-production.up.railway.app/api/v1/violations/evaluate \
@@ -54,6 +62,14 @@ curl -s -X POST https://speed-violation-service-production.up.railway.app/api/v1
   -H "Content-Type: application/json" \
   -H "x-origin: FIXED" \
   -d '{"licensePlate":"INVALIDA","measuredSpeed":80,"speedLimit":60,"equipmentId":"RAD-001","captureTimestamp":"2026-06-17T14:30:00Z"}'
+```
+
+**Erro de validação (400)** — formato de velocidade inválido:
+```bash
+curl -s -X POST https://speed-violation-service-production.up.railway.app/api/v1/violations/evaluate \
+  -H "Content-Type: application/json" \
+  -H "x-origin: FIXED" \
+  -d '{"licensePlate":"ABC1D23","measuredSpeed":"rapido","speedLimit":60,"equipmentId":"RAD-001","captureTimestamp":"2026-06-17T14:30:00Z"}'
 ```
 
 **Consultar infrações por placa:**
@@ -78,6 +94,12 @@ docker-compose up --build
 | API | `http://localhost:8080` |
 | Swagger UI | `http://localhost:8080/swagger-ui.html` |
 | Console visual | `http://localhost:3000` |
+
+Para derrubar e apagar o volume do banco:
+
+```bash
+docker-compose down -v
+```
 
 ### 2. Subir containers individualmente (sem banco)
 
@@ -136,11 +158,7 @@ curl -s -X POST http://localhost:8080/api/v1/violations/evaluate \
 # Consultar por placa
 curl -s "http://localhost:8080/api/v1/violations?licensePlate=ABC1D23"
 ```
-Para derrubar e apagar o volume do banco:
 
-```bash
-docker-compose down -v
-```
 ---
 
 ## Documentação técnica
@@ -205,7 +223,7 @@ A tabela `violations` é criada pelo **Flyway** na primeira subida do serviço (
 
 **Records sem Lombok** — DTOs e modelos de domínio são `record`s Java 21. Com records o boilerplate já não existe, então Lombok seria redundante.
 
-**Validação manual** — `SpeedReadingValidator` em vez de `@Valid` para garantir os error codes exatos do contrato (`INVALID_LICENSE_PLATE`, `INVALID_ORIGIN` etc.) e a ordem de verificação. Bean Validation produziria mensagens genéricas do framework.
+**Validação manual** — `SpeedReadingValidator` em vez de `@Valid` para garantir os error codes exatos do contrato (`INVALID_LICENSE_PLATE`, `INVALID_ORIGIN` etc.) e a ordem de verificação. Os campos `measuredSpeed` e `speedLimit` aceitam valores decimais (arredondados para inteiro antes da avaliação do CTB). Texto não numérico retorna `INVALID_MEASURED_SPEED` / `INVALID_SPEED_LIMIT` com mensagem "formato inválido"; valor ≤ 0 retorna o mesmo code com "deve ser maior que zero".
 
 **Clock injetável** — `processedAt` e verificação de timestamp futuro usam um bean `Clock`, tornando o comportamento temporal determinístico nos testes.
 

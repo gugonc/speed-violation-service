@@ -209,7 +209,7 @@ A tabela `violations` é criada pelo **Flyway** na primeira subida do serviço (
 
 **Clock injetável** — `processedAt` e verificação de timestamp futuro usam um bean `Clock`, tornando o comportamento temporal determinístico nos testes.
 
-**Persistência condicional** — `JdbcViolationRepository` ativa quando `DataSource` está disponível (`@ConditionalOnBean`); `InMemoryViolationRepository` ativa como fallback quando não há banco configurado (`@ConditionalOnMissingBean`). Testes continuam sem depender de banco.
+**Persistência condicional** — `JdbcViolationRepository` ativa quando `SPRING_DATASOURCE_URL` está configurada (condição por propriedade, não por bean); `InMemoryViolationRepository` ativa como fallback quando a propriedade está ausente. Testes continuam sem depender de banco.
 
 **Concorrência segura** — o fallback em memória usa `ConcurrentHashMap<String, CopyOnWriteArrayList<Violation>>` sem locks explícitos; em produção a concorrência é gerenciada pelo próprio PostgreSQL.
 

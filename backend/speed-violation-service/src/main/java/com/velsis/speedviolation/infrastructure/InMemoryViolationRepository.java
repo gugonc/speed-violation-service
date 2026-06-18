@@ -2,17 +2,16 @@ package com.velsis.speedviolation.infrastructure;
 
 import com.velsis.speedviolation.domain.model.Violation;
 import com.velsis.speedviolation.domain.service.ViolationRepository;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.stereotype.Repository;
 
-import javax.sql.DataSource;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 @Repository
-@ConditionalOnMissingBean(DataSource.class)
+@ConditionalOnExpression("'${spring.datasource.url:}'.trim().isEmpty()")
 public class InMemoryViolationRepository implements ViolationRepository {
 
     private final ConcurrentMap<String, List<Violation>> store = new ConcurrentHashMap<>();

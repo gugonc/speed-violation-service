@@ -32,9 +32,9 @@ public class SpeedReadingValidator {
 
     public SpeedReadingCommand validateAndBuild(SpeedReadingRequest request, String originHeader) {
         String plate = requireValidPlate(request.licensePlate());
-        int measuredSpeed = requirePositive(request.measuredSpeed(),
+        int measuredSpeed = requirePositiveNumber(request.measuredSpeed(),
                 ApiError.INVALID_MEASURED_SPEED, "measuredSpeed");
-        int speedLimit = requirePositive(request.speedLimit(),
+        int speedLimit = requirePositiveNumber(request.speedLimit(),
                 ApiError.INVALID_SPEED_LIMIT, "speedLimit");
         String equipmentId = requireNotBlank(request.equipmentId());
         Instant captureTimestamp = requireValidTimestamp(request.captureTimestamp());
@@ -58,11 +58,11 @@ public class SpeedReadingValidator {
         return plate;
     }
 
-    private int requirePositive(Integer value, ApiError error, String field) {
-        if (value == null || value <= 0) {
-            throw new ValidationException(error, field + " must be a positive integer");
+    private int requirePositiveNumber(Double value, ApiError error, String field) {
+        if (value == null || value <= 0 || !Double.isFinite(value)) {
+            throw new ValidationException(error, field + " must be a positive number (km/h)");
         }
-        return value;
+        return (int) Math.round(value);
     }
 
     private String requireNotBlank(String equipmentId) {

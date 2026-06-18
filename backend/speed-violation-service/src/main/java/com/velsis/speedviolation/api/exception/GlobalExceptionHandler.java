@@ -25,6 +25,21 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(HttpMessageNotReadableException.class)
     public ResponseEntity<ErrorResponse> handleUnreadable(HttpMessageNotReadableException ex) {
         log.warn("Malformed request body: {}", ex.getMostSpecificCause().getMessage());
+        Throwable cause = ex.getMostSpecificCause();
+        if (cause instanceof com.fasterxml.jackson.databind.exc.MismatchedInputException mismatch
+                && !mismatch.getPath().isEmpty()) {
+            String field = mismatch.getPath().get(0).getFieldName();
+            if ("measuredSpeed".equals(field)) {
+                return ResponseEntity.badRequest()
+                        .body(ErrorResponse.of(ApiError.INVALID_MEASURED_SPEED.name(),
+                                "measuredSpeed: formato inválido, informe um número positivo"));
+            }
+            if ("speedLimit".equals(field)) {
+                return ResponseEntity.badRequest()
+                        .body(ErrorResponse.of(ApiError.INVALID_SPEED_LIMIT.name(),
+                                "speedLimit: formato inválido, informe um número positivo"));
+            }
+        }
         return ResponseEntity.badRequest()
                 .body(ErrorResponse.of(ApiError.MALFORMED_REQUEST.name(), "Malformed request body"));
     }

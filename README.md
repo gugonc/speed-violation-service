@@ -79,12 +79,6 @@ docker-compose up --build
 | Swagger UI | `http://localhost:8080/swagger-ui.html` |
 | Console visual | `http://localhost:3000` |
 
-Para derrubar e apagar o volume do banco:
-
-```bash
-docker-compose down -v
-```
-
 ### 2. Subir containers individualmente (sem banco)
 
 O backend sem as variáveis de datasource usa armazenamento em memória automaticamente:
@@ -142,7 +136,11 @@ curl -s -X POST http://localhost:8080/api/v1/violations/evaluate \
 # Consultar por placa
 curl -s "http://localhost:8080/api/v1/violations?licensePlate=ABC1D23"
 ```
+Para derrubar e apagar o volume do banco:
 
+```bash
+docker-compose down -v
+```
 ---
 
 ## Documentação técnica

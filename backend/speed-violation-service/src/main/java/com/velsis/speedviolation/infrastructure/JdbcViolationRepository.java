@@ -3,15 +3,14 @@ package com.velsis.speedviolation.infrastructure;
 import com.velsis.speedviolation.domain.model.Severity;
 import com.velsis.speedviolation.domain.model.Violation;
 import com.velsis.speedviolation.domain.service.ViolationRepository;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
-import javax.sql.DataSource;
 import java.util.List;
 
 @Repository
-@ConditionalOnBean(DataSource.class)
+@ConditionalOnExpression("!'${spring.datasource.url:}'.trim().isEmpty()")
 public class JdbcViolationRepository implements ViolationRepository {
 
     private final JdbcTemplate jdbc;

@@ -1,0 +1,13 @@
+package com.velsis.speedviolation.api.exception;
+
+public enum ApiError {
+    INVALID_LICENSE_PLATE,
+    INVALID_MEASURED_SPEED,
+    INVALID_SPEED_LIMIT,
+    INVALID_EQUIPMENT_ID,
+    INVALID_CAPTURE_TIMESTAMP,
+    INVALID_ORIGIN,
+    MISSING_PARAMETER,
+    MALFORMED_REQUEST,
+    INTERNAL_ERROR
+}
